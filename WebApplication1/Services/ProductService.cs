@@ -3,29 +3,24 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class ProductService
+    public class ProductService : IProductService
     {
-        private static string db_source = "webtestdatabase.database.windows.net";
-        private static string db_user = "sqladmin";
-        private static string db_password = "Th@ngg1n@azure";
-        private static string db_database = "appdb";
-        
+        private readonly IConfiguration _configuration;
+
+        public ProductService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         private SqlConnection GetConnection()
         {
-            var _builder = new SqlConnectionStringBuilder
-            {
-                InitialCatalog = db_database,
-                DataSource = db_source,
-                UserID = db_user,
-                Password = db_password
-            };
-            return new SqlConnection(_builder.ConnectionString);
+            return new SqlConnection(_configuration.GetConnectionString("SQLConnection"));
         }
 
         public List<Product> GetProducts()
         {
             SqlConnection conn = GetConnection();
-            List<Product> _productList = new List<Product>();
+            List<Product> _productList = new();
             string statement = "SELECT ProductID,ProductName,Quantity from Products";
             conn.Open();
 
